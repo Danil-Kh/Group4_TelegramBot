@@ -87,10 +87,10 @@ public class testBot extends TelegramLongPollingBot {
     }
     @Override
     public String getBotUsername() {
-        return "https://t.me/testJava10bot";
+        return "";
     }
     @Override
     public String getBotToken(){
-        return "7329214278:AAGsugx-e9kDd9gwjwpENX4DTEzW3haQSbY";
+        return "";
     }
 }
