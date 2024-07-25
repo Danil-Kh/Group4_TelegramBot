@@ -31,6 +31,9 @@ public class TelegramBot extends TelegramLongPollingBot {
     @Override
     public void onUpdateReceived(Update update) {
         long chatId = getChatId(update);
+        if(user.getChatDataMap().get(chatId) == null){
+            user.createNewChatData(chatId);
+        }
         System.out.println("chatId = " + chatId);
 
         if (update.hasMessage() && update.getMessage().getText().equals("/start")) {
@@ -91,10 +94,7 @@ public class TelegramBot extends TelegramLongPollingBot {
                 }
             }
             else if (callbackData.equals("usd_btn")) {
-                ArrayList<Currency> currency = user.getCurrency(chatId) == null?new ArrayList<Currency>():user.getCurrency(chatId);
-                System.out.println(currency);
-                currency.add(Currency.USD);
-                user.setCurrency(chatId, currency);
+                user.setCurrency(chatId, Currency.USD);
             }
             else if (callbackData.equals("notif_btn")) {
                 notificationsEnabled = true;
