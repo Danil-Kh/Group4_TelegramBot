@@ -67,9 +67,10 @@ public class TelegramBot extends TelegramLongPollingBot {
                 }
             } else if (callbackData.equals("bank_btn")) {
                 SendMessagee(chatId, "Оберіть банк",
-                        Map.of("НБУ", "nbu_btn",
-                                "ПриватБанк", "privat_btn",
-                                "Монобанк", "monobank_btn")
+                        Map.of("Банк", "bank_btn",
+                                "Валюти", "curency_btn",
+                                "Оповіщення", "notif_btn",
+                                "Кількість знаків після коми", "decimal_btn")
                 );
                 if(messageReply.getReplyMarkup() != null){
                     messageReply.setReplyMarkup(setupButton.removeKeyboard());
@@ -92,11 +93,18 @@ public class TelegramBot extends TelegramLongPollingBot {
                         throw new RuntimeException(e);
                     }
                 }
-            }
-            else if (callbackData.equals("usd_btn")) {
+            } else if (callbackData.equals("decimal_btn")) { // Обработка кнопки "Кількість знаків після коми"
+                messageReply.setChatId(String.valueOf(chatId));
+                messageReply.setText("Оберіть кількість знаків після коми:");
+                messageReply.setReplyMarkup(setupButton.getDecimalPlacesKeyboardMarkup());
+                try {
+                    execute(messageReply);
+                } catch (TelegramApiException e) {
+                    throw new RuntimeException(e);
+                }
+            } else if (callbackData.equals("usd_btn")) {
                 user.setCurrency(chatId, Currency.USD);
-            }
-            else if (callbackData.equals("notif_btn")) {
+            } else if (callbackData.equals("notif_btn")) {
                 notificationsEnabled = true;
                 sendMessages(chatId, "Please enter a time or 'Off notification'");
             } else {
@@ -107,6 +115,17 @@ public class TelegramBot extends TelegramLongPollingBot {
 
         if (notificationsEnabled && update.hasMessage()) {
             sendMessages(chatId, update.getMessage().getText());
+        }
+        if (update.hasMessage() && (update.getMessage().getText().equals("2") || update.getMessage().getText().equals("3") || update.getMessage().getText().equals("4"))) {
+            int decimalPlaces = Integer.parseInt(update.getMessage().getText());
+            user.setDecimalPlaces(chatId, decimalPlaces);
+            messageReply.setChatId(String.valueOf(chatId));
+            messageReply.setText("Встановлено кількість знаків після коми: " + decimalPlaces);
+            try {
+                execute(messageReply);
+            } catch (TelegramApiException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
@@ -169,12 +188,12 @@ public class TelegramBot extends TelegramLongPollingBot {
 
     @Override
     public String getBotToken() {
-        return "7138847779:AAHvBvcxW1CxC8CFGNCNeX9nXbtnX2Jq_Mo";
+        return "7300865235:AAEIz3E56vHoJ_fHxhaqozwL1zk2uRIfS3U";
     }
 
     @Override
     public String getBotUsername() {
-        return "s1lent_JavaProject_Testbot";
+        return "newbotzelya3000bot";
     }
 
     private void SendMessagee(long chatId, String text, Map<String, String> button) {

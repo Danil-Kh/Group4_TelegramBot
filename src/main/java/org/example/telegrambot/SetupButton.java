@@ -41,4 +41,14 @@ public class SetupButton {
         keyboardRemove.setRemoveKeyboard(true);
         return keyboardRemove;
     }
+    public ReplyKeyboardMarkup getDecimalPlacesKeyboardMarkup() {
+        KeyboardRow row = new KeyboardRow();
+        row.add("2");
+        row.add("3");
+        row.add("4");
+        List<KeyboardRow> keyboardRowList = new ArrayList<>();
+        keyboardRowList.add(row);
+        keyboardMarkup.setKeyboard(keyboardRowList);
+        return keyboardMarkup;
+    }
 }
