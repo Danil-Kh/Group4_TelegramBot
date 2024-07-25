@@ -13,11 +13,11 @@ import java.util.Map;
 public class TelegramBotUtils {
     public static Long getChatId(Update update) {
         if (update.hasMessage()) {
-            return update.getMessage().getFrom().getId();
+            return update.getMessage().getChatId();
         }
 
         if (update.hasCallbackQuery()) {
-            return update.getCallbackQuery().getFrom().getId();
+            return update.getCallbackQuery().getMessage().getChatId();
         }
 
         return null;

@@ -17,7 +17,6 @@ public class User {
     private static final String FILE_NAME = "src/main/java/org/example/dto/chat_data.json";
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
     private static Map<Long, ChatData> chatDataMap;
-    private static final ArrayList<Currency> defaultCurrency = new ArrayList<>();
     //внутрішній клас, свого роду нода, тип даних для позначення того, що до мапи з ключем chatId належить об’єкт ChatData, що містить інфу про назву банку, к-сть знаків після коми та валюти, курс яких буде показуватись.
 
     public User() {
@@ -29,28 +28,31 @@ public class User {
         System.out.println(chatDataMap);
         return chatDataMap.get(chatId).currency;
     }
-
+    public Map<Long, ChatData> getChatDataMap (){
+        return chatDataMap;
+    }
     //запис інфи про назву валюти та подальше її збереження до файлу json
-    public void setCurrency(long chatId, ArrayList<Currency> currency) {
-        getOrCreateChatData(chatId).currency = currency;
+    public void setCurrency(long chatId, Currency currency) {
         System.out.println("SetCurrency works!!!");
+        chatDataMap.get(chatId).currency.add(currency);
         saveToFile();
     }
     //запис інфи про к-сть знаків після коми та подальше її збереження до файлу json
     public void setDecimalPlaces(long chatId, int decimalPlaces) {
-        getOrCreateChatData(chatId).decimalPlaces = decimalPlaces;
+        chatDataMap.get(chatId).decimalPlaces = decimalPlaces;
         saveToFile();
     }
     //запис інфи про назву банку та подальше її збереження до файлу json
     public void setBankName(long chatId, Bank bankName) {
-        getOrCreateChatData(chatId).bankName = bankName;
+        chatDataMap.get(chatId).bankName = bankName;
         saveToFile();
     }
-
-    //створення нової комірки ChatData, якщо користувач новий/відсутній у файлі, інакше - повернути дану комірку.
-    private ChatData getOrCreateChatData(long chatId) {
+    //створення нової комірки ChatData, якщо користувач новий/відсутній у файлі
+    public void createNewChatData(long chatId){
+        System.out.println("creates data");
+        ArrayList<Currency> defaultCurrency = new ArrayList<>();
         defaultCurrency.add(Currency.UAH);
-        return chatDataMap.computeIfAbsent(chatId, k -> new ChatData(defaultCurrency, 0, Bank.NBU));
+        chatDataMap.putIfAbsent(chatId, new ChatData(defaultCurrency, 2, Bank.NBU));
     }
     //Отримання мапи(інфи з ДБ) для подальшої її зміни та запису.
     private void loadFromFile() {
@@ -58,10 +60,8 @@ public class User {
             Type type = new TypeToken<Map<Long, ChatData>>(){}.getType();
             chatDataMap = gson.fromJson(reader, type);
             System.out.println("Loads!!!");
-            if (chatDataMap == null) {
+            if(chatDataMap == null)
                 chatDataMap = new HashMap<>();
-                System.out.println("Loads!!!");
-            }
         } catch (IOException e) {
             chatDataMap = new HashMap<>();
             System.out.println("Loads!!!");
