@@ -1,2 +1,4 @@
-doesn't work class User.java
-(method setCurrency in User.java just doesn't do anything)
+class User.java works(for now only with currencies(without logic required to delete if the same currency is entered for the second time))
+Now all that's left is to connect User.java to other buttons, to notifs and to get info from User.java
+Not existing anything on buttons for banks(only wrapped, logic for changing .json isn't there yet) and for decimal places.
+The same for getting info
