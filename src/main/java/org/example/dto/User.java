@@ -17,7 +17,6 @@ public class User {
     private static final String FILE_NAME = "src/main/java/org/example/dto/chat_data.json";
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
     private static Map<Long, ChatData> chatDataMap;
-    //внутрішній клас, свого роду нода, тип даних для позначення того, що до мапи з ключем chatId належить об’єкт ChatData, що містить інфу про назву банку, к-сть знаків після коми та валюти, курс яких буде показуватись.
 
     public User() {
         //Метод LoadFromFile, який отримує інфу з файлу json та дозволяє змінювати інфу надалі.
