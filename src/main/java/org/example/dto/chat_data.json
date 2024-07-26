@@ -1,0 +1,25 @@
+{
+  "219646819": {
+    "currency": [
+      "UAH",
+      "USD",
+      "USD",
+      "USD",
+      "USD",
+      "USD",
+      "USD",
+      "USD",
+      "USD",
+      "USD"
+    ],
+    "decimalPlaces": 2,
+    "bankName": "NBU"
+  },
+  "219646809": {
+    "currency": [
+      "UAH"
+    ],
+    "decimalPlaces": 2,
+    "bankName": "PRIVATBANK"
+  }
+}
