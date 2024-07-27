@@ -26,12 +26,12 @@ public class TelegramBot extends TelegramLongPollingBot {
     private final SetupButton setupButton = new SetupButton();
     private ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
     private boolean notificationsEnabled = false;
-    private User user = new User();
+    private final User user = new User();
 
     @Override
     public void onUpdateReceived(Update update) {
         long chatId = getChatId(update);
-        if(user.getChatDataMap().get(chatId) == null){
+        if(User.getChatDataMap() == null){
             user.createNewChatData(chatId);
         }
         System.out.println("chatId = " + chatId);
@@ -95,6 +95,9 @@ public class TelegramBot extends TelegramLongPollingBot {
             }
             else if (callbackData.equals("usd_btn")) {
                 user.setCurrency(chatId, Currency.USD);
+            }
+            else if (callbackData.equals("eur_btn")) {
+                user.setCurrency(chatId, Currency.EUR);
             }
             else if (callbackData.equals("notif_btn")) {
                 notificationsEnabled = true;
