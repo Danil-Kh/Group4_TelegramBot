@@ -1,8 +1,5 @@
 package org.example.dto;
 
-import org.example.dto.Bank;
-import org.example.dto.Currency;
-
 import java.util.ArrayList;
 
 class ChatData {
