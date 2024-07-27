@@ -47,59 +47,59 @@ public class TelegramBot extends TelegramLongPollingBot {
             }
         } else if (update.hasCallbackQuery()) {
             String callbackData = update.getCallbackQuery().getData();
-            if (callbackData.equals("settings_btn")) {
-                SendMessagee(chatId, "Налаштування",
-                        Map.of("Банк", "bank_btn",
-                                "Валюти", "curency_btn",
-                                "Оповіщення", "notif_btn")
-                );
-                if(messageReply.getReplyMarkup() != null){
-                    messageReply.setReplyMarkup(setupButton.removeKeyboard());
-                    try {
-                        execute(messageReply);
-                    } catch (TelegramApiException e) {
-                        throw new RuntimeException(e);
+            switch (callbackData) {
+                case "settings_btn" -> {
+                    SendMessagee(chatId, "Налаштування",
+                            Map.of("Банк", "bank_btn",
+                                    "Валюти", "curency_btn",
+                                    "Оповіщення", "notif_btn")
+                    );
+                    if (messageReply.getReplyMarkup() != null) {
+                        messageReply.setReplyMarkup(setupButton.removeKeyboard());
+                        try {
+                            execute(messageReply);
+                        } catch (TelegramApiException e) {
+                            throw new RuntimeException(e);
+                        }
                     }
                 }
-            } else if (callbackData.equals("bank_btn")) {
-                SendMessagee(chatId, "Оберіть банк",
-                        Map.of("НБУ", "nbu_btn",
-                                "ПриватБанк", "privat_btn",
-                                "Монобанк", "monobank_btn")
-                );
-                if(messageReply.getReplyMarkup() != null){
-                    messageReply.setReplyMarkup(setupButton.removeKeyboard());
-                    try {
-                        execute(messageReply);
-                    } catch (TelegramApiException e) {
-                        throw new RuntimeException(e);
+                case "bank_btn" -> {
+                    SendMessagee(chatId, "Оберіть банк",
+                            Map.of("НБУ", "nbu_btn",
+                                    "ПриватБанк", "privat_btn",
+                                    "Монобанк", "monobank_btn")
+                    );
+                    if (messageReply.getReplyMarkup() != null) {
+                        messageReply.setReplyMarkup(setupButton.removeKeyboard());
+                        try {
+                            execute(messageReply);
+                        } catch (TelegramApiException e) {
+                            throw new RuntimeException(e);
+                        }
                     }
                 }
-            } else if (callbackData.equals("curency_btn")) {
-                SendMessagee(chatId, "Оберіть валюти",
-                        Map.of("USD", "usd_btn",
-                                "EUR", "eur_btn")
-                );
-                if(messageReply.getReplyMarkup() != null){
-                    messageReply.setReplyMarkup(setupButton.removeKeyboard());
-                    try {
-                        execute(messageReply);
-                    } catch (TelegramApiException e) {
-                        throw new RuntimeException(e);
+                case "curency_btn" -> {
+                    SendMessagee(chatId, "Оберіть валюти",
+                            Map.of("USD", "usd_btn",
+                                    "EUR", "eur_btn")
+                    );
+                    if (messageReply.getReplyMarkup() != null) {
+                        messageReply.setReplyMarkup(setupButton.removeKeyboard());
+                        try {
+                            execute(messageReply);
+                        } catch (TelegramApiException e) {
+                            throw new RuntimeException(e);
+                        }
                     }
                 }
-            }
-            else if (callbackData.equals("usd_btn")) {
-                user.setCurrency(chatId, Currency.USD);
-            }
-            else if (callbackData.equals("eur_btn")) {
-                user.setCurrency(chatId, Currency.EUR);
-            }
-            else if (callbackData.equals("notif_btn")) {
-                notificationsEnabled = true;
-                sendMessages(chatId, "Please enter a time or 'Off notification'");
-            } else {
-                notificationsEnabled = false;
+                case "usd_btn" -> user.setCurrency(chatId, Currency.USD);
+                case "eur_btn" -> user.setCurrency(chatId, Currency.EUR);
+                case "notif_btn" -> {
+                    notificationsEnabled = true;
+                    sendMessages(chatId, "Please enter a time or 'Off notification'");
+                }
+                default -> notificationsEnabled = false;
+
                 // Handle other button presses
             }
         }
