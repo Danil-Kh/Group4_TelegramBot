@@ -3,11 +3,9 @@ package org.example.dto;
 import java.util.ArrayList;
 
 class ChatData {
-    protected ArrayList<Currency> currency;  /* На вибір, хто як захоче(валюта як цифра чи валюта як слово)
-        повинно бути передано до сеттеру у вигляді однієї строки, записано через кому,
-        далі повинна йти перевірка на те які валюти вибрані для того щоб змінювати кнопки. */
-    protected int decimalPlaces;  //0-3
-    protected Bank bankName; //1 - НБУ, 2 - ПриватБанк, 3 - МоноБанк
+    protected ArrayList<Currency> currency;  /* масив що приймає елементи типу currency, по дефолту - UAN */
+    protected int decimalPlaces;  //від 0 до 3, по дефолту - 2
+    protected Bank bankName; //змінна типу Bank, NBU/PRIVATBANK/MONOBANK, по дефолту - NBU
 
     ChatData(ArrayList<Currency> currency, int decimalPlaces, Bank bankName) {
         this.currency = currency;
