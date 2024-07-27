@@ -3,8 +3,8 @@ package org.example.service;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-import org.example.dto.Bank;
 import org.example.dto.Currency;
+import org.example.dto.Bank;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 public class PrivatBank {
-    public static String getExchangeRates (Map<Currency, Double> currencyMap, int rounding) throws IOException, InterruptedException {
+    public static String getExchangeRates(Map<Currency, Double> currencyMap, int decimalPlaces) throws IOException, InterruptedException {
         String result = "";
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
@@ -26,21 +26,19 @@ public class PrivatBank {
                 .GET()
                 .build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-
         int statusCode = response.statusCode();
         if (statusCode >= 200 && statusCode < 300) {
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
-            Type currencyListType = new TypeToken<List<CurrencyPrivat>>() {
-            }.getType();
-            List<CurrencyPrivat> currencyList = gson.fromJson((String) response.body(), currencyListType);
+            Type currencyListType = new TypeToken<List<CurrencyPrivat>>() {}.getType();
+            List<CurrencyPrivat> currencyList = gson.fromJson(response.body(), currencyListType);
             if (currencyList != null) {
-                    currencyList.stream()
-                            .filter(currencyPrivat -> currencyMap.containsKey(Currency.fromCodeL(currencyPrivat.getCcy())))
-                            .forEach(currencyPrivat -> {
-                               Currency currency = Currency.fromCodeL(currencyPrivat.getCcy());
-                                Double roundedRate = Math.round(currencyPrivat.getBuy() * Math.pow(10, rounding)) / Math.pow(10, rounding);
-                                currencyMap.put(currency, roundedRate);
-                            });
+                currencyList.stream()
+                        .filter(currencyPrivat -> currencyMap.containsKey(Currency.fromCodeL(currencyPrivat.getCcy())))
+                        .forEach(currencyPrivat -> {
+                            Currency currency = Currency.fromCodeL(currencyPrivat.getCcy());
+                            Double roundedRate = round(currencyPrivat.getBuy(), decimalPlaces);
+                            currencyMap.put(currency, roundedRate);
+                        });
             } else {
                 return "No currency data available";
             }
@@ -48,6 +46,13 @@ public class PrivatBank {
             return "Failed to fetch exchange rates. HTTP status code: " + statusCode;
         }
         return result;
+    }
+
+    private static Double round(Double value, int decimalPlaces) {
+        if (value == null) {
+            return null;
+        }
+        return Math.round(value * Math.pow(10, decimalPlaces)) / Math.pow(10, decimalPlaces);
     }
 
     private static class CurrencyPrivat {

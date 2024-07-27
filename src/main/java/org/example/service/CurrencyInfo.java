@@ -7,15 +7,20 @@ import java.io.IOException;
 import java.util.Map;
 
 public class CurrencyInfo {
+    private int decimalPlaces;
 
-    public String getExchangeRates(Bank bank, Map<Currency,Double> currencies, int rounding){
+    public CurrencyInfo(int decimalPlaces) {
+        this.decimalPlaces = decimalPlaces;
+    }
+
+    public String getExchangeRates(Bank bank, Map<Currency, Double> currencies) {
         try {
             return switch (bank) {
-                case Bank.NBU -> NBU.getExchangeRates(currencies, rounding);
-                case Bank.PRIVATBANK -> PrivatBank.getExchangeRates(currencies, rounding);
-                case Bank.MONOBANK -> Monobank.getExchangeRates(currencies, rounding);
+                case NBU -> NBU.getExchangeRates(currencies, decimalPlaces);
+                case PRIVATBANK -> PrivatBank.getExchangeRates(currencies, decimalPlaces);
+                case MONOBANK -> Monobank.getExchangeRates(currencies, decimalPlaces);
             };
-        } catch (IOException | InterruptedException e){
+        } catch (IOException | InterruptedException e) {
             return e.getMessage();
         }
     }

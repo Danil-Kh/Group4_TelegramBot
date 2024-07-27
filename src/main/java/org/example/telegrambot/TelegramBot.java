@@ -5,13 +5,10 @@ import org.example.dto.User;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -31,7 +28,7 @@ public class TelegramBot extends TelegramLongPollingBot {
     @Override
     public void onUpdateReceived(Update update) {
         long chatId = getChatId(update);
-        if(user.getChatDataMap().get(chatId) == null){
+        if (user.getChatDataMap().get(chatId) == null) {
             user.createNewChatData(chatId);
         }
         System.out.println("chatId = " + chatId);
@@ -41,7 +38,7 @@ public class TelegramBot extends TelegramLongPollingBot {
                     Map.of("Отримати інформацію", "info_btn",
                             "Налаштування", "settings_btn")
             );
-            if(messageReply.getReplyMarkup() != null){
+            if (messageReply.getReplyMarkup() != null) {
                 messageReply.setReplyMarkup(setupButton.removeKeyboard());
                 try {
                     execute(messageReply);
@@ -57,7 +54,7 @@ public class TelegramBot extends TelegramLongPollingBot {
                                 "Валюти", "curency_btn",
                                 "Оповіщення", "notif_btn")
                 );
-                if(messageReply.getReplyMarkup() != null){
+                if (messageReply.getReplyMarkup() != null) {
                     messageReply.setReplyMarkup(setupButton.removeKeyboard());
                     try {
                         execute(messageReply);
@@ -72,7 +69,7 @@ public class TelegramBot extends TelegramLongPollingBot {
                                 "Оповіщення", "notif_btn",
                                 "Кількість знаків після коми", "decimal_btn")
                 );
-                if(messageReply.getReplyMarkup() != null){
+                if (messageReply.getReplyMarkup() != null) {
                     messageReply.setReplyMarkup(setupButton.removeKeyboard());
                     try {
                         execute(messageReply);
@@ -85,7 +82,7 @@ public class TelegramBot extends TelegramLongPollingBot {
                         Map.of("USD", "usd_btn",
                                 "EUR", "eur_btn")
                 );
-                if(messageReply.getReplyMarkup() != null){
+                if (messageReply.getReplyMarkup() != null) {
                     messageReply.setReplyMarkup(setupButton.removeKeyboard());
                     try {
                         execute(messageReply);
@@ -93,7 +90,7 @@ public class TelegramBot extends TelegramLongPollingBot {
                         throw new RuntimeException(e);
                     }
                 }
-            } else if (callbackData.equals("decimal_btn")) { // Обработка кнопки "Кількість знаків після коми"
+            } else if (callbackData.equals("decimal_btn")) {
                 messageReply.setChatId(String.valueOf(chatId));
                 messageReply.setText("Оберіть кількість знаків після коми:");
                 messageReply.setReplyMarkup(setupButton.getDecimalPlacesKeyboardMarkup());
@@ -104,9 +101,25 @@ public class TelegramBot extends TelegramLongPollingBot {
                 }
             } else if (callbackData.equals("usd_btn")) {
                 user.setCurrency(chatId, Currency.USD);
+                messageReply.setText("USD added to your selected currencies.");
+                try {
+                    execute(messageReply);
+                } catch (TelegramApiException e) {
+                    throw new RuntimeException(e);
+                }
             } else if (callbackData.equals("notif_btn")) {
                 notificationsEnabled = true;
                 sendMessages(chatId, "Please enter a time or 'Off notification'");
+            } else if (callbackData.matches("\\d+")) { // Check for number of decimal places
+                int decimalPlaces = Integer.parseInt(callbackData);
+                user.setDecimalPlaces(chatId, decimalPlaces);
+                messageReply.setChatId(String.valueOf(chatId));
+                messageReply.setText("Встановлено кількість знаків після коми: " + decimalPlaces);
+                try {
+                    execute(messageReply);
+                } catch (TelegramApiException e) {
+                    throw new RuntimeException(e);
+                }
             } else {
                 notificationsEnabled = false;
                 // Handle other button presses
@@ -116,7 +129,8 @@ public class TelegramBot extends TelegramLongPollingBot {
         if (notificationsEnabled && update.hasMessage()) {
             sendMessages(chatId, update.getMessage().getText());
         }
-        if (update.hasMessage() && (update.getMessage().getText().equals("2") || update.getMessage().getText().equals("3") || update.getMessage().getText().equals("4"))) {
+
+        if (update.hasMessage() && update.getMessage().getText().matches("\\d+")) {
             int decimalPlaces = Integer.parseInt(update.getMessage().getText());
             user.setDecimalPlaces(chatId, decimalPlaces);
             messageReply.setChatId(String.valueOf(chatId));
@@ -128,6 +142,7 @@ public class TelegramBot extends TelegramLongPollingBot {
             }
         }
     }
+
 
     private void sendMessages(long chatId, String userText) {
         messageReply.setChatId(String.valueOf(chatId));
