@@ -1,5 +1,6 @@
 package org.example.telegrambot;
 
+import org.example.dto.Bank;
 import org.example.dto.Currency;
 import org.example.dto.User;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
@@ -93,12 +94,14 @@ public class TelegramBot extends TelegramLongPollingBot {
                 }
                 case "usd_btn" -> user.setCurrency(chatId, Currency.USD);
                 case "eur_btn" -> user.setCurrency(chatId, Currency.EUR);
+                case "privat_btn" -> user.setBankName(chatId, Bank.PRIVATBANK);
+                case "monobank_btn" -> user.setBankName(chatId, Bank.MONOBANK);
+                case "nbu_btn" -> user.setBankName(chatId, Bank.NBU);
                 case "notif_btn" -> {
                     notificationsEnabled = true;
                     sendMessages(chatId, "Please enter a time or 'Off notification'");
                 }
                 default -> notificationsEnabled = false;
-
                 // Handle other button presses
             }
         }
@@ -176,25 +179,6 @@ public class TelegramBot extends TelegramLongPollingBot {
     }
 
     private void SendMessagee(long chatId, String text, Map<String, String> button) {
-        /*
-        if(messageReply.equals(null)) {
-            System.out.println("Работает нормально");
-            SendMessage message = createMessage(chatId, text, button);
-            sendApiMethodAsync(message);
-        }
-        else {
-            messageReply.setReplyMarkup(setupButton.removeKeyboard());
-            try {
-                execute(messageReply);
-            } catch (TelegramApiException e) {
-                System.out.println("Error sending message: " + e.getMessage());
-            }
-            System.out.println("Работает нормально");
-            SendMessage message = createMessage(chatId, text, button);
-            sendApiMethodAsync(message);
-        }
-
-         */
         SendMessage message = createMessage(chatId, text, button);
         sendApiMethodAsync(message);
     }

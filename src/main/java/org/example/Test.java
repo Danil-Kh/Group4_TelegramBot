@@ -1,15 +1,10 @@
 package org.example;
 
-import org.example.dto.Bank;
-import org.example.dto.Currency;
-import org.example.service.CurrencyInfo;
 import org.example.telegrambot.TelegramBot;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 
-import java.util.HashMap;
-import java.util.Map;
 
 public class Test {
     /*
@@ -53,9 +48,6 @@ public class Test {
 
     }
     */
-
-
-
     public static void main(String[] args){
         try {
             TelegramBotsApi telegramBotsApi = new TelegramBotsApi(DefaultBotSession.class);
