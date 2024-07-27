@@ -5,13 +5,10 @@ import org.example.dto.User;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -21,7 +18,6 @@ import static org.example.telegrambot.TelegramBotUtils.createMessage;
 import static org.example.telegrambot.TelegramBotUtils.getChatId;
 
 public class TelegramBot extends TelegramLongPollingBot {
-    private final SendMessage message = new SendMessage();
     private final SendMessage messageReply = new SendMessage();
     private final SetupButton setupButton = new SetupButton();
     private ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
