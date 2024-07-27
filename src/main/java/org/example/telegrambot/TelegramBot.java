@@ -30,7 +30,6 @@ public class TelegramBot extends TelegramLongPollingBot {
         if(User.getChatDataMap() == null){
             user.createNewChatData(chatId);
         }
-        System.out.println("chatId = " + chatId);
 
         if (update.hasMessage() && update.getMessage().getText().equals("/start")) {
             SendMessagee(chatId, "Ласкаво просимо. Цей бот допоможе відслідковувати актуальні курси валют",
