@@ -11,11 +11,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+@Getter
 public class User {
     private static final String FILE_NAME = "src/main/java/org/example/dto/chat_data.json";
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
-    @Getter
-    private static Map<Long, ChatData> chatDataMap;
+    private Map<Long, ChatData> chatDataMap;
 
     public User() {
         //Метод LoadFromFile, який отримує інфу з файлу json та дозволяє змінювати інфу надалі.
@@ -29,6 +29,18 @@ public class User {
         else chatDataMap.get(chatId).currency.add(currency);
         saveToFile();
     }
+    public ArrayList<Currency> getCurrency(long chatId) {
+        return chatDataMap.get(chatId).currency;
+    }
+    public int getDecimalPlaces(long chatId) {
+        return chatDataMap.get(chatId).decimalPlaces;
+    }
+    public Bank getBankName(long chatId) {
+        return chatDataMap.get(chatId).bankName;
+    }
+    public int getNotificationTime(long chatId) {
+        return chatDataMap.get(chatId).notificationTime;
+    }
     //запис інфи про к-сть знаків після коми та подальше її збереження до файлу json
     public void setDecimalPlaces(long chatId, int decimalPlaces) {
         chatDataMap.get(chatId).decimalPlaces = decimalPlaces;
@@ -39,11 +51,18 @@ public class User {
         chatDataMap.get(chatId).bankName = bankName;
         saveToFile();
     }
+    public void setNotificationTime(long chatId, int notificationTime) {
+        chatDataMap.get(chatId).notificationTime = notificationTime;
+        saveToFile();
+    }
+
+
+
     //створення нової комірки ChatData, якщо користувач новий/відсутній у БД
     public void createNewChatData(long chatId){
         ArrayList<Currency> defaultCurrency = new ArrayList<>();
-        defaultCurrency.add(Currency.UAH);
-        chatDataMap.putIfAbsent(chatId, new ChatData(defaultCurrency, 2, Bank.NBU));
+        defaultCurrency.add(Currency.EUR);
+        chatDataMap.putIfAbsent(chatId, new ChatData(defaultCurrency, 2, Bank.NBU, -1));
     }
     //Отримання мапи(інфи з ДБ) для подальшої її зміни та запису.
     private void loadFromFile() {
