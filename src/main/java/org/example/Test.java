@@ -1,10 +1,7 @@
 package org.example;
 
 import org.example.telegrambot.TelegramBot;
-import org.telegram.telegrambots.meta.TelegramBotsApi;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
-
+import org.telegram.telegrambots.longpolling.TelegramBotsLongPollingApplication;
 
 public class Test {
     /*
@@ -49,10 +46,11 @@ public class Test {
     }
     */
     public static void main(String[] args){
-        try {
-            TelegramBotsApi telegramBotsApi = new TelegramBotsApi(DefaultBotSession.class);
-            telegramBotsApi.registerBot(new TelegramBot());
-        } catch (TelegramApiException e) {
+        String botToken = "7138847779:AAHvBvcxW1CxC8CFGNCNeX9nXbtnX2Jq_Mo";
+        try(TelegramBotsLongPollingApplication telegramBotsApi = new TelegramBotsLongPollingApplication()) {
+            telegramBotsApi.registerBot(botToken, new TelegramBot(botToken));
+            Thread.currentThread().join();
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

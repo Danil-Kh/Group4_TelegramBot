@@ -3,10 +3,12 @@ package org.example.telegrambot;
 import org.example.dto.Bank;
 import org.example.dto.Currency;
 import org.example.dto.User;
-import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.client.okhttp.OkHttpTelegramClient;
+import org.telegram.telegrambots.longpolling.util.LongPollingSingleThreadUpdateConsumer;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import org.telegram.telegrambots.meta.generics.TelegramClient;
 
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
@@ -18,21 +20,27 @@ import java.util.concurrent.TimeUnit;
 import static org.example.telegrambot.TelegramBotUtils.createMessage;
 import static org.example.telegrambot.TelegramBotUtils.getChatId;
 
-public class TelegramBot extends TelegramLongPollingBot {
-    private final SendMessage messageReply = new SendMessage();
+public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
     private final SetupButton setupButton = new SetupButton();
     private ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
     private boolean notificationsEnabled = false;
     private final User user = new User();
+    private final TelegramClient telegramClient;
+
+    public TelegramBot(String botToken) {
+        telegramClient = new OkHttpTelegramClient(botToken);
+    }
 
     @Override
-    public void onUpdateReceived(Update update) {
+    public void consume(Update update) {
+
         long chatId = getChatId(update);
-        if(User.getChatDataMap() == null){
+        if(user.getChatDataMap().get(chatId) == null){
             user.createNewChatData(chatId);
         }
 
         if (update.hasMessage() && update.getMessage().getText().equals("/start")) {
+            SendMessage messageReply = new SendMessage(update.getMessage().getChatId().toString(), update.getMessage().getText());
             SendMessagee(chatId, "Ласкаво просимо. Цей бот допоможе відслідковувати актуальні курси валют",
                     Map.of("Отримати інформацію", "info_btn",
                             "Налаштування", "settings_btn")
@@ -40,24 +48,26 @@ public class TelegramBot extends TelegramLongPollingBot {
             if(messageReply.getReplyMarkup() != null){
                 messageReply.setReplyMarkup(setupButton.removeKeyboard());
                 try {
-                    execute(messageReply);
+                    telegramClient.executeAsync(messageReply);
                 } catch (TelegramApiException e) {
                     throw new RuntimeException(e);
                 }
             }
         } else if (update.hasCallbackQuery()) {
+            SendMessage messageReply = new SendMessage(update.getCallbackQuery().getMessage().getChatId().toString(), update.getCallbackQuery().getData());
             String callbackData = update.getCallbackQuery().getData();
             switch (callbackData) {
                 case "settings_btn" -> {
                     SendMessagee(chatId, "Налаштування",
                             Map.of("Банк", "bank_btn",
                                     "Валюти", "curency_btn",
+                                    "К-сть знаків після коми", "decplace_btn",
                                     "Оповіщення", "notif_btn")
                     );
                     if (messageReply.getReplyMarkup() != null) {
                         messageReply.setReplyMarkup(setupButton.removeKeyboard());
                         try {
-                            execute(messageReply);
+                            telegramClient.executeAsync(messageReply);
                         } catch (TelegramApiException e) {
                             throw new RuntimeException(e);
                         }
@@ -72,7 +82,7 @@ public class TelegramBot extends TelegramLongPollingBot {
                     if (messageReply.getReplyMarkup() != null) {
                         messageReply.setReplyMarkup(setupButton.removeKeyboard());
                         try {
-                            execute(messageReply);
+                            telegramClient.executeAsync(messageReply);
                         } catch (TelegramApiException e) {
                             throw new RuntimeException(e);
                         }
@@ -86,7 +96,22 @@ public class TelegramBot extends TelegramLongPollingBot {
                     if (messageReply.getReplyMarkup() != null) {
                         messageReply.setReplyMarkup(setupButton.removeKeyboard());
                         try {
-                            execute(messageReply);
+                            telegramClient.executeAsync(messageReply);
+                        } catch (TelegramApiException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                }
+                case "decplace_btn" -> {
+                    SendMessagee(chatId, "Оберіть к-сть знаків після коми",
+                            Map.of("2", "2p_btn",
+                                    "3", "3p_btn",
+                                    "4", "4p_btn")
+                    );
+                    if (messageReply.getReplyMarkup() != null) {
+                        messageReply.setReplyMarkup(setupButton.removeKeyboard());
+                        try {
+                            telegramClient.executeAsync(messageReply);
                         } catch (TelegramApiException e) {
                             throw new RuntimeException(e);
                         }
@@ -97,9 +122,12 @@ public class TelegramBot extends TelegramLongPollingBot {
                 case "privat_btn" -> user.setBankName(chatId, Bank.PRIVATBANK);
                 case "monobank_btn" -> user.setBankName(chatId, Bank.MONOBANK);
                 case "nbu_btn" -> user.setBankName(chatId, Bank.NBU);
+                case "2p_btn" -> user.setDecimalPlaces(chatId, 2);
+                case "3p_btn" -> user.setDecimalPlaces(chatId, 3);
+                case "4p_btn" -> user.setDecimalPlaces(chatId, 4);
                 case "notif_btn" -> {
                     notificationsEnabled = true;
-                    sendMessages(chatId, "Please enter a time or 'Off notification'");
+                    sendMessages(chatId, "Please enter a time or 'Off notification'", messageReply);
                 }
                 default -> notificationsEnabled = false;
                 // Handle other button presses
@@ -107,12 +135,12 @@ public class TelegramBot extends TelegramLongPollingBot {
         }
 
         if (notificationsEnabled && update.hasMessage()) {
-            sendMessages(chatId, update.getMessage().getText());
+            SendMessage messageReply = new SendMessage(update.getMessage().getChatId().toString(), update.getMessage().getText());
+            sendMessages(chatId, update.getMessage().getText(), messageReply);
         }
     }
 
-    private void sendMessages(long chatId, String userText) {
-        messageReply.setChatId(String.valueOf(chatId));
+    private void sendMessages(long chatId, String userText, SendMessage messageReply) {
         messageReply.setReplyMarkup(setupButton.getKeyboardMarkup());
 
         switch (userText) {
@@ -138,7 +166,7 @@ public class TelegramBot extends TelegramLongPollingBot {
         }
 
         try {
-            execute(messageReply);
+            telegramClient.executeAsync(messageReply);
         } catch (TelegramApiException e) {
             throw new RuntimeException(e);
         }
@@ -157,29 +185,21 @@ public class TelegramBot extends TelegramLongPollingBot {
         }
 
         service.scheduleAtFixedRate(() -> {
-            SendMessage message = new SendMessage();
-            message.setChatId(String.valueOf(chatId));
-            message.setText("Scheduled notification");
+            SendMessage message = new SendMessage(String.valueOf(chatId), "Scheduled notification");
             try {
-                execute(message);
+                telegramClient.executeAsync(message);
             } catch (TelegramApiException e) {
                 System.out.println("Error sending message: " + e.getMessage());
             }
         }, delay, TimeUnit.DAYS.toSeconds(1), TimeUnit.SECONDS);
     }
 
-    @Override
-    public String getBotToken() {
-        return "7138847779:AAHvBvcxW1CxC8CFGNCNeX9nXbtnX2Jq_Mo";
-    }
-
-    @Override
-    public String getBotUsername() {
-        return "s1lent_JavaProject_Testbot";
-    }
-
     private void SendMessagee(long chatId, String text, Map<String, String> button) {
         SendMessage message = createMessage(chatId, text, button);
-        sendApiMethodAsync(message);
+        try {
+            telegramClient.executeAsync(message);
+        } catch (TelegramApiException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

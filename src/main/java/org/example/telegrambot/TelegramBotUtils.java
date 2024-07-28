@@ -4,6 +4,7 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardRow;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -11,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 public class TelegramBotUtils {
-    public static Long getChatId(Update update) {
+    public static long getChatId(Update update) {
         if (update.hasMessage()) {
             return update.getMessage().getChatId();
         }
@@ -20,11 +21,11 @@ public class TelegramBotUtils {
             return update.getCallbackQuery().getMessage().getChatId();
         }
 
-        return null;
+        return 0;
     }
 
-    public static SendMessage createMessage(Long chatId, String text) {
-        SendMessage message = new SendMessage();
+    public static SendMessage createMessage(long chatId, String text) {
+        SendMessage message = new SendMessage(String.valueOf(chatId), text);
         message.setText(new String(text.getBytes(), StandardCharsets.UTF_8));
         // message.setParseMode("markdown");
         message.setChatId(chatId);
@@ -39,19 +40,18 @@ public class TelegramBotUtils {
     }
 
     private static void attachButtons(SendMessage message, Map<String, String> buttons) {
-        InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
-        List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
+
+        List<InlineKeyboardRow> keyboard = new ArrayList<>();
 
         for (String buttonName : buttons.keySet()) {
             String buttonValue = buttons.get(buttonName);
 
-            InlineKeyboardButton button = new InlineKeyboardButton();
-            button.setText(new String(buttonName.getBytes(), StandardCharsets.UTF_8));
+            InlineKeyboardButton button = new InlineKeyboardButton(new String(buttonName.getBytes(), StandardCharsets.UTF_8));
             button.setCallbackData(buttonValue);
 
-            keyboard.add(List.of(button));
+            keyboard.add(new InlineKeyboardRow(button));
         }
-
+        InlineKeyboardMarkup markup = new InlineKeyboardMarkup(keyboard);
         markup.setKeyboard(keyboard);
         message.setReplyMarkup(markup);
     }
