@@ -10,9 +10,12 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @Getter
 public class User {
+    Logger logger = Logger.getLogger(User.class.getName());
     private static final String FILE_NAME = "src/main/java/org/example/dto/chat_data.json";
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
     private Map<Long, ChatData> chatDataMap;
@@ -56,8 +59,6 @@ public class User {
         saveToFile();
     }
 
-
-
     //створення нової комірки ChatData, якщо користувач новий/відсутній у БД
     public void createNewChatData(long chatId){
         ArrayList<Currency> defaultCurrency = new ArrayList<>();
@@ -80,7 +81,7 @@ public class User {
         try (FileWriter writer = new FileWriter(FILE_NAME)) {
             gson.toJson(chatDataMap, writer);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.log(Level.SEVERE, "Exception occurred", e);
         }
     }
 }
