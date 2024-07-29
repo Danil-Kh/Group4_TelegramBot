@@ -1,13 +1,15 @@
-package SendingNotifications;
+package org.example.telegrambot;
 
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardRemove;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class SetupButton {
-    private final ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
+    List<KeyboardRow> keyboardRowList = new ArrayList<>();
+    private final ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup(keyboardRowList);
     private void setupButton(){
         KeyboardRow row = new KeyboardRow();
         row.add("9");
@@ -24,7 +26,6 @@ public class SetupButton {
         KeyboardRow row3 = new KeyboardRow();
         row3.add("18");
         row3.add("Off notification");
-        List<KeyboardRow> keyboardRowList = new ArrayList<>();
         keyboardRowList.add(row);
         keyboardRowList.add(row1);
         keyboardRowList.add(row2);
@@ -34,5 +35,8 @@ public class SetupButton {
     public ReplyKeyboardMarkup getKeyboardMarkup() {
         setupButton();
         return keyboardMarkup;
+    }
+    public ReplyKeyboardRemove removeKeyboard() {
+        return new ReplyKeyboardRemove(true);
     }
 }
