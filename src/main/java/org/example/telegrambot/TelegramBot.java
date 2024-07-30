@@ -42,16 +42,17 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
             for(int i=0; i<user.getChatDataMap().size(); ++i) {
                 if (user.getChatDataMap().values().stream().toList().get(i).notificationTime != -1) {
                     decimal.add(user.getChatDataMap().values().stream().toList().get(i).decimalPlaces);
-                    delays.add(now.until(LocalTime.of(user.getChatDataMap().values().stream().toList().get(i).notificationTime, 15), ChronoUnit.SECONDS));
+                    delays.add(now.until(LocalTime.of(user.getChatDataMap().values().stream().toList().get(i).notificationTime, 0), ChronoUnit.SECONDS));
                     bankNames.add(user.getChatDataMap().values().stream().toList().get(i).bankName);
                     currencies.add(user.getChatDataMap().values().stream().toList().get(i).currency);
                 }
             }
             for(int i=0; i<delays.size(); ++i){
                 int finalI = i;
+                LocalTime time = LocalTime.of(user.getChatDataMap().values().stream().toList().get(finalI).notificationTime, 0);
                 scheduledNotifications.put(user.getChatDataMap().keySet().stream().toList().get(finalI), Executors.newSingleThreadScheduledExecutor());
                 scheduledNotifications.get(user.getChatDataMap().keySet().stream().toList().get(finalI)).scheduleAtFixedRate(() -> {
-                    if (now.getHour() == LocalTime.of(user.getChatDataMap().values().stream().toList().get(finalI).notificationTime, 16).getHour() && now.getMinute() == LocalTime.of(user.getChatDataMap().values().stream().toList().get(finalI).notificationTime, 16).getMinute()) {
+                    if (now.getHour() == time.getHour() && now.getMinute() == time.getMinute()) {
                         String string = currencyInfo.getExchangeRates(bankNames.get(finalI), currencies.get(finalI), decimal.get(finalI));
                         SendMessage message = new SendMessage(String.valueOf(user.getChatDataMap().keySet().stream().toList().get(finalI)), string);
                         try {
@@ -130,7 +131,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         messageReply.setReplyMarkup(setupButton.getKeyboardMarkup());
 
         switch (userText) {
-            case "19":
+            case "9":
             case "10":
             case "11":
             case "12":
@@ -141,7 +142,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
             case "17":
             case "18":
                 messageReply.setText("The notification will arrive at " + userText);
-                sendMessagesByTime(chatId, LocalTime.of(Integer.parseInt(userText), 16));
+                sendMessagesByTime(chatId, LocalTime.of(Integer.parseInt(userText), 0));
                 messageReply.setReplyMarkup(setupButton.removeKeyboard());
                 user.setNotificationTime(chatId, Integer.parseInt(userText));
                 notificationsEnabled = false;
