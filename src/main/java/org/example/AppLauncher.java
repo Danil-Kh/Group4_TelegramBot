@@ -2,18 +2,17 @@ package org.example;
 
 import org.example.telegrambot.TelegramBot;
 import org.telegram.telegrambots.longpolling.TelegramBotsLongPollingApplication;
-
 import java.io.IOException;
 import java.util.Properties;
 import java.util.logging.*;
 
-public class Test {
-    static Logger logger = Logger.getLogger(Test.class.getName());
+public class AppLauncher {
     public static void main(String[] args){
+        Logger logger = Logger.getLogger(AppLauncher.class.getName());
         String botToken = "";
         Properties prop = new Properties();
         try {
-            prop.load(Test.class.getClassLoader().getResourceAsStream("config.properties"));
+            prop.load(AppLauncher.class.getClassLoader().getResourceAsStream("config.properties"));
             botToken = prop.getProperty("token");
         }
         catch (IOException ex) {
