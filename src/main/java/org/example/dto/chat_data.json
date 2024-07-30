@@ -1,10 +1,11 @@
 {
   "788621474": {
     "currency": [
-      "EUR"
+      "EUR",
+      "USD"
     ],
-    "decimalPlaces": 2,
-    "bankName": "MONOBANK",
-    "notificationTime": 19
+    "decimalPlaces": 3,
+    "bankName": "PRIVATBANK",
+    "notificationTime": 10
   }
 }

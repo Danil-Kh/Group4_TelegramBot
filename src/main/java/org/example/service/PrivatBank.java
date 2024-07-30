@@ -3,6 +3,8 @@ package org.example.service;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+import lombok.Getter;
+import lombok.Setter;
 import org.example.dto.Bank;
 import org.example.dto.Currency;
 
@@ -18,21 +20,23 @@ import java.util.Map;
 public class PrivatBank {
     public static String getExchangeRates (Map<Currency, Double> currencyMap, int rounding) throws IOException, InterruptedException {
         String result = "";
-        HttpClient client = HttpClient.newHttpClient();
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(Bank.PRIVATBANK.getUri())
-                .timeout(Duration.ofMinutes(1))
-                .header("Content-Type", "application/json")
-                .GET()
-                .build();
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        HttpResponse<String> response;
+        try (HttpClient client = HttpClient.newHttpClient()) {
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(Bank.PRIVATBANK.getUri())
+                    .timeout(Duration.ofMinutes(1))
+                    .header("Content-Type", "application/json")
+                    .GET()
+                    .build();
+            response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        }
 
         int statusCode = response.statusCode();
         if (statusCode >= 200 && statusCode < 300) {
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
             Type currencyListType = new TypeToken<List<CurrencyPrivat>>() {
             }.getType();
-            List<CurrencyPrivat> currencyList = gson.fromJson((String) response.body(), currencyListType);
+            List<CurrencyPrivat> currencyList = gson.fromJson(response.body(), currencyListType);
             if (currencyList != null) {
                     currencyList.stream()
                             .filter(currencyPrivat -> currencyMap.containsKey(Currency.fromCodeL(currencyPrivat.getCcy())))
@@ -50,18 +54,11 @@ public class PrivatBank {
         return result;
     }
 
+    @Setter
+    @Getter
     private static class CurrencyPrivat {
         private String ccy;
-        private String base_ccy;
         private double buy;
-        private double sale;
 
-        public String getCcy() {
-            return ccy;
-        }
-
-        public double getBuy() {
-            return buy;
-        }
     }
 }

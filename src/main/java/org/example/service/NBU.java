@@ -3,9 +3,10 @@ package org.example.service;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+import lombok.Setter;
 import org.example.dto.Bank;
 import org.example.dto.Currency;
-
+import lombok.Getter;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.net.http.HttpClient;
@@ -19,26 +20,28 @@ public class NBU {
 
     public static String getExchangeRates (Map<Currency, Double> currencyMap, int rounding) throws IOException, InterruptedException {
         String result = "";
-        HttpClient client = HttpClient.newHttpClient();
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(Bank.NBU.getUri())
-                .timeout(Duration.ofMinutes(1))
-                .header("Content-Type", "application/json")
-                .GET()
-                .build();
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        HttpResponse<String> response;
+        try (HttpClient client = HttpClient.newHttpClient()) {
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(Bank.NBU.getUri())
+                    .timeout(Duration.ofMinutes(1))
+                    .header("Content-Type", "application/json")
+                    .GET()
+                    .build();
+            response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        }
 
         int statusCode = response.statusCode();
         if (statusCode >= 200 && statusCode < 300) {
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
             Type currencyListType = new TypeToken<List<CurrencyNBU>>() {
             }.getType();
-            List<CurrencyNBU> responseList = gson.fromJson((String) response.body(), currencyListType);
+            List<CurrencyNBU> responseList = gson.fromJson(response.body(), currencyListType);
             if (responseList != null) {
                 responseList.stream()
-                        .filter(responseCurrency -> currencyMap.containsKey(Currency.fromCode(responseCurrency.getCod())))
+                        .filter(responseCurrency -> currencyMap.containsKey(Currency.fromCode(responseCurrency.getR030())))
                         .forEach(responseCurrency -> {
-                            Currency currency = Currency.fromCode(responseCurrency.getCod());
+                            Currency currency = Currency.fromCode(responseCurrency.getR030());
                             Double roundedRate = Math.round(responseCurrency.getRate() * Math.pow(10, rounding)) / Math.pow(10, rounding);
                             currencyMap.put(currency, roundedRate);
                         });
@@ -51,19 +54,12 @@ public class NBU {
         return result;
     }
 
+    @Getter
+    @Setter
     private static class CurrencyNBU {
         private int r030;
-        private String txt;
         private double rate;
-        private String cc;
 
-        public int getCod() {
-            return r030;
-        }
-
-        public double getRate() {
-            return rate;
-        }
     }
 }
 
