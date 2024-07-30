@@ -45,9 +45,9 @@ public class TelegramBotUtils {
 
         for (String buttonName : buttons.keySet()) {
             String buttonValue = buttons.get(buttonName);
-
             InlineKeyboardButton button = new InlineKeyboardButton(new String(buttonName.getBytes(), StandardCharsets.UTF_8));
             button.setCallbackData(buttonValue);
+
 
             keyboard.add(new InlineKeyboardRow(button));
         }

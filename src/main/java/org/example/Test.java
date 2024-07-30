@@ -2,8 +2,7 @@ package org.example;
 
 import org.example.telegrambot.TelegramBot;
 import org.telegram.telegrambots.longpolling.TelegramBotsLongPollingApplication;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.logging.*;
 
 public class Test {
     /*
@@ -44,7 +43,6 @@ public class Test {
         for (Map.Entry<Currency, Double> entry : mapCurrencies.entrySet()) {
             System.out.println("Currency: " + entry.getKey() + ", Rate: " + entry.getValue());
         }
-
     }
     */
     static Logger logger = Logger.getLogger(Test.class.getName());
