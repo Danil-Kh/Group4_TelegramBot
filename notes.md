@@ -1,1 +1,1 @@
-class User.java is now almost perfected. Logic and realisation of buttons for currency/bank changing is present. Decimal Places is absent for now, though is ready to be added(Avaits next meeting with team). Check marks are all that remains and project is going to be ready for merge)
+Code is ready.
