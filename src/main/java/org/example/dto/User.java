@@ -18,7 +18,7 @@ public class User {
     Logger logger = Logger.getLogger(User.class.getName());
     private static final String FILE_NAME = "src/main/java/org/example/dto/chat_data.json";
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
-    private Map<Long, ChatData> chatDataMap;
+    Map<Long, ChatData> chatDataMap;
 
     public User() {
         //Метод LoadFromFile, який отримує інфу з файлу json та дозволяє змінювати інфу надалі.
@@ -27,9 +27,11 @@ public class User {
     //запис інфи про назву валюти та подальше її збереження до файлу json
     public void setCurrency(long chatId, Currency currency) {
         //реалізація логіки для валют: видалення при наявності в БД + повторному натисканні кнопки, інакше - додати валюту
-        if(chatDataMap.get(chatId).currency.contains(currency))
-            chatDataMap.get(chatId).currency.remove(currency);
-        else chatDataMap.get(chatId).currency.add(currency);
+        if (chatDataMap.get(chatId).currency.size() == 1) {
+            if(chatDataMap.get(chatId).currency.contains(currency))
+                chatDataMap.get(chatId).currency.remove(currency);
+            else chatDataMap.get(chatId).currency.add(currency);
+        }
         saveToFile();
     }
     public ArrayList<Currency> getCurrency(long chatId) {
@@ -41,9 +43,8 @@ public class User {
     public Bank getBankName(long chatId) {
         return chatDataMap.get(chatId).bankName;
     }
-    public int getNotificationTime(long chatId) {
-        return chatDataMap.get(chatId).notificationTime;
-    }
+
+
     //запис інфи про к-сть знаків після коми та подальше її збереження до файлу json
     public void setDecimalPlaces(long chatId, int decimalPlaces) {
         chatDataMap.get(chatId).decimalPlaces = decimalPlaces;
@@ -84,4 +85,6 @@ public class User {
             logger.log(Level.SEVERE, "Exception occurred", e);
         }
     }
+
+
 }
