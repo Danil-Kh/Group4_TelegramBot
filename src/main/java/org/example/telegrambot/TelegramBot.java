@@ -91,36 +91,131 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                                 "К-сть знаків після коми", "decplace_btn",
                                 "Оповіщення", "notif_btn")
                 );
-                case "bank_btn" -> SendMessagee(chatId, "Оберіть банк",
-                        Map.of("НБУ", "nbu_btn",
-                                "ПриватБанк", "privat_btn",
-                                "Монобанк", "monobank_btn")
-                );
-                case "curency_btn" -> SendMessagee(chatId, "Оберіть валюти",
-                        Map.of("USD", "usd_btn",
-                                "EUR", "eur_btn")
-                );
-                case "decplace_btn" -> SendMessagee(chatId, "Оберіть к-сть знаків після коми",
-                        Map.of("2", "2p_btn",
-                                "3", "3p_btn",
-                                "4", "4p_btn")
-                );
-                case "usd_btn" -> user.setCurrency(chatId, Currency.USD);
-                case "eur_btn" -> user.setCurrency(chatId, Currency.EUR);
-                case "privat_btn" -> user.setBankName(chatId, Bank.PRIVATBANK);
-                case "monobank_btn" -> user.setBankName(chatId, Bank.MONOBANK);
-                case "nbu_btn" -> user.setBankName(chatId, Bank.NBU);
-                case "2p_btn" -> user.setDecimalPlaces(chatId, 2);
-                case "3p_btn" -> user.setDecimalPlaces(chatId, 3);
-                case "4p_btn" -> user.setDecimalPlaces(chatId, 4);
+                case "bank_btn" -> {
+                    String unitPrivat = user.getBankName(chatId).equals(Bank.PRIVATBANK)?"✅":"";
+                    String unitMono = user.getBankName(chatId).equals(Bank.MONOBANK)?"✅":"";
+                    String unitNBU = user.getBankName(chatId).equals(Bank.NBU)?"✅":"";
+                    SendMessagee(chatId, "Оберіть банк",
+                            Map.of(unitNBU+"НБУ", "nbu_btn",
+                                    unitPrivat+"ПриватБанк", "privat_btn",
+                                    unitMono+"Монобанк", "monobank_btn")
+                    );
+                }
+                case "curency_btn" -> {
+                    String unitUSD = user.getCurrency(chatId).contains(Currency.USD)?"✅":"";
+                    String unitEUR = user.getCurrency(chatId).contains(Currency.EUR)?"✅":"";
+                    SendMessagee(chatId, "Оберіть валюти",
+                            Map.of(unitUSD+"USD", "usd_btn",
+                                    unitEUR+"EUR", "eur_btn")
+                    );
+                }
+                case "decplace_btn" -> {
+                    String unit2 = user.getDecimalPlaces(chatId) == 2?"✅":"";
+                    String unit3 = user.getDecimalPlaces(chatId) == 3?"✅":"";
+                    String unit4 = user.getDecimalPlaces(chatId) == 4?"✅":"";
+                    SendMessagee(chatId, "Оберіть к-сть знаків після коми",
+                            Map.of(unit2+"2", "2p_btn",
+                                    unit3+"3", "3p_btn",
+                                    unit4+"4", "4p_btn")
+                    );
+                }
+                case "usd_btn" -> {
+                    user.setCurrency(chatId, Currency.USD);
+                    String unitUSD = user.getCurrency(chatId).contains(Currency.USD)?"✅":"";
+                    String unitEUR = user.getCurrency(chatId).contains(Currency.EUR)?"✅":"";
+                    SendMessagee(chatId, "Оберіть валюти",
+                            Map.of(unitUSD+"USD", "usd_btn",
+                                    unitEUR+"EUR", "eur_btn")
+                    );
+                }
+                case "eur_btn" -> {
+                    user.setCurrency(chatId, Currency.EUR);
+                    String unitUSD = user.getCurrency(chatId).contains(Currency.USD)?"✅":"";
+                    String unitEUR = user.getCurrency(chatId).contains(Currency.EUR)?"✅":"";
+                    SendMessagee(chatId, "Оберіть валюти",
+                            Map.of(unitUSD+"USD", "usd_btn",
+                                    unitEUR+"EUR", "eur_btn")
+                    );
+                }
+                case "privat_btn" -> {
+                    user.setBankName(chatId, Bank.PRIVATBANK);
+                    String unitPrivat = user.getBankName(chatId).equals(Bank.PRIVATBANK)?"✅":"";
+                    String unitMono = user.getBankName(chatId).equals(Bank.MONOBANK)?"✅":"";
+                    String unitNBU = user.getBankName(chatId).equals(Bank.NBU)?"✅":"";
+                    SendMessagee(chatId, "Оберіть банк",
+                            Map.of(unitNBU+"НБУ", "nbu_btn",
+                                    unitPrivat+"ПриватБанк", "privat_btn",
+                                    unitMono+"Монобанк", "monobank_btn")
+                    );
+                }
+                case "monobank_btn" -> {
+                    user.setBankName(chatId, Bank.MONOBANK);
+                    String unitPrivat = user.getBankName(chatId).equals(Bank.PRIVATBANK)?"✅":"";
+                    String unitMono = user.getBankName(chatId).equals(Bank.MONOBANK)?"✅":"";
+                    String unitNBU = user.getBankName(chatId).equals(Bank.NBU)?"✅":"";
+                    SendMessagee(chatId, "Оберіть банк",
+                            Map.of(unitNBU+"НБУ", "nbu_btn",
+                                    unitPrivat+"ПриватБанк", "privat_btn",
+                                    unitMono+"Монобанк", "monobank_btn")
+                    );
+                }
+                case "nbu_btn" -> {
+                    user.setBankName(chatId, Bank.NBU);
+                    String unitPrivat = user.getBankName(chatId).equals(Bank.PRIVATBANK)?"✅":"";
+                    String unitMono = user.getBankName(chatId).equals(Bank.MONOBANK)?"✅":"";
+                    String unitNBU = user.getBankName(chatId).equals(Bank.NBU)?"✅":"";
+                    SendMessagee(chatId, "Оберіть банк",
+                            Map.of(unitNBU+"НБУ", "nbu_btn",
+                                    unitPrivat+"ПриватБанк", "privat_btn",
+                                    unitMono+"Монобанк", "monobank_btn")
+                    );
+                }
+                case "2p_btn" -> {
+                    user.setDecimalPlaces(chatId, 2);
+                    String unit2 = user.getDecimalPlaces(chatId) == 2?"✅":"";
+                    String unit3 = user.getDecimalPlaces(chatId) == 3?"✅":"";
+                    String unit4 = user.getDecimalPlaces(chatId) == 4?"✅":"";
+                    SendMessagee(chatId, "Оберіть к-сть знаків після коми",
+                            Map.of(unit2+"2", "2p_btn",
+                                    unit3+"3", "3p_btn",
+                                    unit4+"4", "4p_btn")
+                    );
+                }
+                case "3p_btn" -> {
+                    user.setDecimalPlaces(chatId, 3);
+                    String unit2 = user.getDecimalPlaces(chatId) == 2?"✅":"";
+                    String unit3 = user.getDecimalPlaces(chatId) == 3?"✅":"";
+                    String unit4 = user.getDecimalPlaces(chatId) == 4?"✅":"";
+                    SendMessagee(chatId, "Оберіть к-сть знаків після коми",
+                            Map.of(unit2+"2", "2p_btn",
+                                    unit3+"3", "3p_btn",
+                                    unit4+"4", "4p_btn")
+                    );
+                }
+                case "4p_btn" -> {
+                    user.setDecimalPlaces(chatId, 4);
+                    String unit2 = user.getDecimalPlaces(chatId) == 2?"✅":"";
+                    String unit3 = user.getDecimalPlaces(chatId) == 3?"✅":"";
+                    String unit4 = user.getDecimalPlaces(chatId) == 4?"✅":"";
+                    SendMessagee(chatId, "Оберіть к-сть знаків після коми",
+                            Map.of(unit2+"2", "2p_btn",
+                                    unit3+"3", "3p_btn",
+                                    unit4+"4", "4p_btn")
+                    );
+                }
                 case "notif_btn" -> {
                     notificationsEnabled = true;
                     sendMessages(chatId, "Please enter a time or 'Off notification'", messageReply);
                 }
+                case "info_btn" -> SendMessagee(chatId, "Банк: " + user.getBankName(chatId).name() + "\n" + currencyInfo.getExchangeRates(
+                        user.getBankName(chatId),
+                        user.getCurrency(chatId),
+                        user.getDecimalPlaces(chatId)
+                ));
+
                 default -> notificationsEnabled = false;
             }
         }
-
         if (notificationsEnabled && update.hasMessage()) {
             SendMessage messageReply = new SendMessage(update.getMessage().getChatId().toString(), update.getMessage().getText());
             sendMessages(chatId, update.getMessage().getText(), messageReply);
@@ -156,7 +251,6 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                 break;
             default:
                 messageReply.setText("Click on the button");
-
         }
 
         try {
@@ -164,7 +258,6 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
         } catch (TelegramApiException e) {
             throw new RuntimeException(e);
         }
-
     }
 
     private void sendMessagesByTime(long chatId, LocalTime time) {
@@ -191,13 +284,19 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
                     }
                 }
             }, delay, TimeUnit.DAYS.toSeconds(1), TimeUnit.SECONDS);
-
         }
-
     }
 
     private void SendMessagee(long chatId, String text, Map<String, String> button) {
         SendMessage message = createMessage(chatId, text, button);
+        try {
+            telegramClient.executeAsync(message);
+        } catch (TelegramApiException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    private void SendMessagee(long chatId, String text) {
+        SendMessage message = createMessage(chatId, text);
         try {
             telegramClient.executeAsync(message);
         } catch (TelegramApiException e) {

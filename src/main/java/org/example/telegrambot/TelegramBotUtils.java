@@ -20,14 +20,12 @@ public class TelegramBotUtils {
         if (update.hasCallbackQuery()) {
             return update.getCallbackQuery().getMessage().getChatId();
         }
-
         return 0;
     }
 
     public static SendMessage createMessage(long chatId, String text) {
         SendMessage message = new SendMessage(String.valueOf(chatId), text);
         message.setText(new String(text.getBytes(), StandardCharsets.UTF_8));
-        // message.setParseMode("markdown");
         message.setChatId(chatId);
         return message;
     }
@@ -47,8 +45,6 @@ public class TelegramBotUtils {
             String buttonValue = buttons.get(buttonName);
             InlineKeyboardButton button = new InlineKeyboardButton(new String(buttonName.getBytes(), StandardCharsets.UTF_8));
             button.setCallbackData(buttonValue);
-
-
             keyboard.add(new InlineKeyboardRow(button));
         }
         InlineKeyboardMarkup markup = new InlineKeyboardMarkup(keyboard);

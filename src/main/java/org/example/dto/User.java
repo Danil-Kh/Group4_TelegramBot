@@ -27,10 +27,14 @@ public class User {
     //запис інфи про назву валюти та подальше її збереження до файлу json
     public void setCurrency(long chatId, Currency currency) {
         //реалізація логіки для валют: видалення при наявності в БД + повторному натисканні кнопки, інакше - додати валюту
-        if (chatDataMap.get(chatId).currency.size() == 1) {
+        if (chatDataMap.get(chatId).currency.size() > 1) {
             if(chatDataMap.get(chatId).currency.contains(currency))
                 chatDataMap.get(chatId).currency.remove(currency);
             else chatDataMap.get(chatId).currency.add(currency);
+        }
+        else {
+            if(!chatDataMap.get(chatId).currency.contains(currency))
+                chatDataMap.get(chatId).currency.add(currency);
         }
         saveToFile();
     }

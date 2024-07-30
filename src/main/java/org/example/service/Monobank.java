@@ -3,6 +3,8 @@ package org.example.service;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+import lombok.Setter;
+import lombok.Getter;
 import org.example.dto.Bank;
 import org.example.dto.Currency;
 
@@ -20,21 +22,23 @@ public class Monobank {
     public static String getExchangeRates (Map<Currency, Double> currencyMap, int rounding) throws IOException, InterruptedException {
         String result = "";
         int codeUAH = Currency.UAH.getCurrencyCode();
-        HttpClient client = HttpClient.newHttpClient();
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(Bank.MONOBANK.getUri())
-                .timeout(Duration.ofMinutes(1))
-                .header("Content-Type", "application/json")
-                .GET()
-                .build();
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        HttpResponse<String> response;
+        try (HttpClient client = HttpClient.newHttpClient()) {
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(Bank.MONOBANK.getUri())
+                    .timeout(Duration.ofMinutes(1))
+                    .header("Content-Type", "application/json")
+                    .GET()
+                    .build();
+            response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        }
 
         int statusCode = response.statusCode();
         if (statusCode >= 200 && statusCode < 300) {
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
             Type currencyListType = new TypeToken<List<CurrencyMonobank>>() {
             }.getType();
-            List<CurrencyMonobank> responseList = gson.fromJson((String) response.body(), currencyListType);
+            List<CurrencyMonobank> responseList = gson.fromJson(response.body(), currencyListType);
             if (responseList != null) {
                 for (CurrencyMonobank currency : responseList) {
                     Currency currency1 = Currency.fromCode(currency.getCurrencyCodeA());
@@ -53,24 +57,12 @@ public class Monobank {
         return result;
     }
 
+    @Setter
+    @Getter
     private static class CurrencyMonobank {
+        public int currencyCodeB;
         private int currencyCodeA;
-        private int currencyCodeB;
-        private Double rateSell;
         private Double rateBuy;
-
-        public int getCurrencyCodeA() {
-            return currencyCodeA;
-        }
-
-        public int getCurrencyCodeB() {
-            return currencyCodeB;
-        }
-
-        public Double getRateBuy() {
-            return rateBuy;
-        }
-
     }
 }
 

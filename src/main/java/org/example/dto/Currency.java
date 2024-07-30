@@ -2,38 +2,25 @@ package org.example.dto;
 
 //public class CurrencyBank {
 
+import lombok.Getter;
+
 import java.util.Arrays;
 
+@Getter
 public enum Currency {
-        USD(840, "USD", "United States Dollar", false),
-        EUR(978, "EUR", "Euro", false),
-        UAH(980, "UAH", "Ukrainian Hryvnia", true);
+        USD(840, "USD", "United States Dollar"),
+        EUR(978, "EUR", "Euro"),
+        UAH(980, "UAH", "Ukrainian Hryvnia");
 
         private final int currencyCode;
         private final String currencyCodeL;
         private final String currencyName;
-        private final boolean isChosen;
 
-        Currency(int currencyCode, String currencyCodeL, String currencyName, boolean isChosen) {
+        Currency(int currencyCode, String currencyCodeL, String currencyName) {
             this.currencyCode = currencyCode;
             this.currencyCodeL = currencyCodeL;
             this.currencyName = currencyName;
-            this.isChosen = isChosen;
         }
-
-        public int getCurrencyCode() {
-            return currencyCode;
-        }
-
-        public String getCurrencyCodeL() {
-            return currencyCodeL;
-        }
-
-        public String getCurrencyName() {
-            return currencyName;
-        }
-
-        public boolean getChosen() { return isChosen; }
 
         public static Currency fromCode(int code) {
             return Arrays.stream(Currency.values())
@@ -48,4 +35,5 @@ public enum Currency {
                 .findFirst()
                 .orElse(null);
     }
+
 }

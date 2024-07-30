@@ -11,9 +11,7 @@ import java.net.URI;
 
         private final URI uri;
 
-        Bank(URI uri) {
-            this.uri = uri;
-        }
+        Bank(URI uri) { this.uri = uri; }
 
     }
 
