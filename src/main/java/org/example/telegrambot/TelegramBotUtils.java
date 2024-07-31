@@ -22,10 +22,7 @@ public class TelegramBotUtils {
     }
 
     public static SendMessage createMessage(long chatId, String text) {
-        SendMessage message = new SendMessage(String.valueOf(chatId), text);
-        message.setText(new String(text.getBytes(), StandardCharsets.UTF_8));
-        message.setChatId(chatId);
-        return message;
+        return new SendMessage(String.valueOf(chatId), new String(text.getBytes(), StandardCharsets.UTF_8));
     }
 
     public static SendMessage createMessage(Long chatId, String text, Map<String, String> buttons) {
