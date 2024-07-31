@@ -14,6 +14,7 @@ import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -30,38 +31,11 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
     private final Map<Long, ScheduledExecutorService> scheduledNotifications = new HashMap<>();
 
     public TelegramBot(String botToken) {
+        //Налаштування з’єднання програми з ботом:
         telegramClient = new OkHttpTelegramClient(botToken);
-        ArrayList<Integer> decimal = new ArrayList<>();
-        ArrayList<Long> delays = new ArrayList<>();
-        ArrayList<Bank> bankNames = new ArrayList<>();
-        ArrayList<ArrayList<Currency>> currencies = new ArrayList<>();
-        LocalTime now = LocalTime.now();
-        if(!user.getChatDataMap().isEmpty()) {
-            for(int i=0; i<user.getChatDataMap().size(); ++i) {
-                if (user.getChatDataMap().values().stream().toList().get(i).notificationTime != -1) {
-                    decimal.add(user.getChatDataMap().values().stream().toList().get(i).decimalPlaces);
-                    delays.add(now.until(LocalTime.of(user.getChatDataMap().values().stream().toList().get(i).notificationTime, 0), ChronoUnit.SECONDS));
-                    bankNames.add(user.getChatDataMap().values().stream().toList().get(i).bankName);
-                    currencies.add(user.getChatDataMap().values().stream().toList().get(i).currency);
-                }
-            }
-            for(int i=0; i<delays.size(); ++i){
-                int finalI = i;
-                LocalTime time = LocalTime.of(user.getChatDataMap().values().stream().toList().get(finalI).notificationTime, 0);
-                scheduledNotifications.put(user.getChatDataMap().keySet().stream().toList().get(finalI), Executors.newSingleThreadScheduledExecutor());
-                scheduledNotifications.get(user.getChatDataMap().keySet().stream().toList().get(finalI)).scheduleAtFixedRate(() -> {
-                    if (now.getHour() == time.getHour() && now.getMinute() == time.getMinute()) {
-                        String string = currencyInfo.getExchangeRates(bankNames.get(finalI), currencies.get(finalI), decimal.get(finalI));
-                        SendMessage message = new SendMessage(String.valueOf(user.getChatDataMap().keySet().stream().toList().get(finalI)), string);
-                        try {
-                            telegramClient.executeAsync(message);
-                        } catch (TelegramApiException e) {
-                            System.out.println("Error sending message: " + e.getMessage());
-                        }
-                    }
-                }, delays.get(finalI), TimeUnit.DAYS.toSeconds(1), TimeUnit.SECONDS);
-            }
-        }
+        //Перезапуск всіх запланованих потоків/виконавців команд для оповіщень,
+        //що були запущені перед примусовим/вимушеним вимкненням бота:
+        restartAllScheduledNotificationExecutors();
     }
 
     @Override
@@ -299,6 +273,53 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
             telegramClient.executeAsync(message);
         } catch (TelegramApiException e) {
             throw new RuntimeException(e);
+        }
+    }
+    //реалізація методу для перезапуску всіх запланованих потоків/виконавців команд для оповіщень
+    private void restartAllScheduledNotificationExecutors() {
+        List<Integer> decimal = new ArrayList<>();
+        List<Long> delays = new ArrayList<>();
+        List<Bank> bankNames = new ArrayList<>();
+        List<List<Currency>> currencies = new ArrayList<>();
+        LocalTime now = LocalTime.now();
+        //Отримуємо з БД дані про тих користувачів які запланували отримання оповіщень про курс валют
+        //Перевірка на те чи не пуста БД з якої ми отримуємо інформацію:
+        if(!user.getChatDataMap().isEmpty()) {
+            for(int i=0; i<user.getChatDataMap().size(); ++i) {
+                //Перевірка на те чи користувач запланував отримання оповіщень:
+                if (user.getChatDataMap().values().stream().toList().get(i).notificationTime != -1) {
+                    decimal.add(user.getChatDataMap().values().stream().toList().get(i).decimalPlaces);
+                    delays.add(now.until(LocalTime.of(user.getChatDataMap().values().stream().toList().get(i).notificationTime, 0), ChronoUnit.SECONDS));
+                    bankNames.add(user.getChatDataMap().values().stream().toList().get(i).bankName);
+                    currencies.add(user.getChatDataMap().values().stream().toList().get(i).currency);
+                }
+            }
+            /* Проходимось по кожному отриманому користувачеві і для кожного перезапускаємо потік,
+             що буде оповіщувати кожного користувача про останній(дійсний) курс валют (перевірка в реальному часі)
+              допоки не буде вимкнено оповіщення чи не буде вимкнено бота: */
+            for(int i=0; i<delays.size(); ++i){
+                int finalI = i;
+                LocalTime time = LocalTime.of(user.getChatDataMap().values().stream().toList().get(finalI).notificationTime, 0);
+                if (delays.get(finalI) < 0) {
+                    delays.set(finalI, delays.get(finalI) + TimeUnit.DAYS.toSeconds(1));
+                }
+                /*Збереження для подальшого використання всіх потоків,
+                 що будуть запущені для можливості подального вимкнення сповіщень
+                  про поточний курс валют: */
+                scheduledNotifications.put(user.getChatDataMap().keySet().stream().toList().get(finalI), Executors.newSingleThreadScheduledExecutor());
+                //Запуск кожного потоку:
+                scheduledNotifications.get(user.getChatDataMap().keySet().stream().toList().get(finalI)).scheduleAtFixedRate(() -> {
+                    if (now.getHour() == time.getHour() && now.getMinute() == time.getMinute()) {
+                        String string = currencyInfo.getExchangeRates(bankNames.get(finalI), currencies.get(finalI), decimal.get(finalI));
+                        SendMessage message = new SendMessage(String.valueOf(user.getChatDataMap().keySet().stream().toList().get(finalI)), string);
+                        try {
+                            telegramClient.executeAsync(message);
+                        } catch (TelegramApiException e) {
+                            System.out.println("Error sending message: " + e.getMessage());
+                        }
+                    }
+                }, delays.get(finalI), TimeUnit.DAYS.toSeconds(1), TimeUnit.SECONDS);
+            }
         }
     }
 }

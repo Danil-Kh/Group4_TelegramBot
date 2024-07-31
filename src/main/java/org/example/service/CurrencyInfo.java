@@ -2,15 +2,14 @@ package org.example.service;
 
 import org.example.dto.Bank;
 import org.example.dto.Currency;
-
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 public class CurrencyInfo {
 
-    public String getExchangeRates(Bank bank, ArrayList<Currency> arrayCurrency, int rounding){
+    public String getExchangeRates(Bank bank, List<Currency> arrayCurrency, int rounding){
         Map<Currency, Double> mapCurrency = arrayCurrency.stream()
                 .collect(Collectors.toMap(currency -> currency, currency -> 0D));
         String result;

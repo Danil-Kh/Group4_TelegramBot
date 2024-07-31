@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -17,7 +18,7 @@ import java.util.logging.Logger;
 @Getter
 public class User {
     Logger logger = Logger.getLogger(User.class.getName());
-    private static final String FILE_NAME = "src/main/java/org/example/dto/chat_data.json";
+    private static final String FILE_NAME = "src/main/resources/chat_data.json";
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
     Map<Long, ChatData> chatDataMap;
 
@@ -39,7 +40,7 @@ public class User {
         }
         saveToFile();
     }
-    public ArrayList<Currency> getCurrency(long chatId) {
+    public List<Currency> getCurrency(long chatId) {
         return chatDataMap.get(chatId).currency;
     }
     public int getDecimalPlaces(long chatId) {
@@ -67,7 +68,7 @@ public class User {
 
     //створення нової комірки ChatData, якщо користувач новий/відсутній у БД
     public void createNewChatData(long chatId){
-        ArrayList<Currency> defaultCurrency = new ArrayList<>();
+        List<Currency> defaultCurrency = new ArrayList<>();
         defaultCurrency.add(Currency.EUR);
         chatDataMap.putIfAbsent(chatId, new ChatData(defaultCurrency, 2, Bank.NBU, -1));
     }
@@ -87,7 +88,7 @@ public class User {
         try (FileWriter writer = new FileWriter(FILE_NAME)) {
             gson.toJson(chatDataMap, writer);
         } catch (IOException e) {
-            logger.log(Level.SEVERE, "Exception occurred", e);
+            logger.log(Level.SEVERE, "IO Exception occurred", e);
         }
     }
 

@@ -5,7 +5,6 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardRow;
-
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +15,6 @@ public class TelegramBotUtils {
         if (update.hasMessage()) {
             return update.getMessage().getChatId();
         }
-
         if (update.hasCallbackQuery()) {
             return update.getCallbackQuery().getMessage().getChatId();
         }
@@ -38,9 +36,7 @@ public class TelegramBotUtils {
     }
 
     private static void attachButtons(SendMessage message, Map<String, String> buttons) {
-
         List<InlineKeyboardRow> keyboard = new ArrayList<>();
-
         for (String buttonName : buttons.keySet()) {
             String buttonValue = buttons.get(buttonName);
             InlineKeyboardButton button = new InlineKeyboardButton(new String(buttonName.getBytes(), StandardCharsets.UTF_8));

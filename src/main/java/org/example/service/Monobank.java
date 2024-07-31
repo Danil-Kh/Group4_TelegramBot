@@ -7,7 +7,6 @@ import lombok.Setter;
 import lombok.Getter;
 import org.example.dto.Bank;
 import org.example.dto.Currency;
-
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.net.http.HttpClient;
@@ -18,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 
 public class Monobank {
-
     public static String getExchangeRates (Map<Currency, Double> currencyMap, int rounding) throws IOException, InterruptedException {
         String result = "";
         int codeUAH = Currency.UAH.getCurrencyCode();
@@ -47,7 +45,6 @@ public class Monobank {
                         currencyMap.put(currency1, roundedRate);
                     }
                 }
-
             } else {
                 return "No currency data available";
             }

@@ -1,9 +1,6 @@
 package org.example.dto;
 
-//public class CurrencyBank {
-
 import lombok.Getter;
-
 import java.util.Arrays;
 
 @Getter

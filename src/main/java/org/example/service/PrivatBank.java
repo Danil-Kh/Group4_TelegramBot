@@ -7,7 +7,6 @@ import lombok.Getter;
 import lombok.Setter;
 import org.example.dto.Bank;
 import org.example.dto.Currency;
-
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.net.http.HttpClient;

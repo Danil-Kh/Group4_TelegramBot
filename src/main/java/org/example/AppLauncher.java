@@ -9,8 +9,8 @@ import java.util.logging.*;
 public class AppLauncher {
     public static void main(String[] args){
         Logger logger = Logger.getLogger(AppLauncher.class.getName());
-        String botToken = "";
         Properties prop = new Properties();
+        String botToken = "";
         try {
             prop.load(AppLauncher.class.getClassLoader().getResourceAsStream("config.properties"));
             botToken = prop.getProperty("token");

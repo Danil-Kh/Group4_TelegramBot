@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 
 public class NBU {
-
     public static String getExchangeRates (Map<Currency, Double> currencyMap, int rounding) throws IOException, InterruptedException {
         String result = "";
         HttpResponse<String> response;
