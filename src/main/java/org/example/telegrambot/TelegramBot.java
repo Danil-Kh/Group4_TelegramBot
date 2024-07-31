@@ -300,9 +300,6 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
             for(int i=0; i<delays.size(); ++i){
                 int finalI = i;
                 LocalTime time = LocalTime.of(user.getChatDataMap().values().stream().toList().get(finalI).notificationTime, 0);
-                if (delays.get(finalI) < 0) {
-                    delays.set(finalI, delays.get(finalI) + TimeUnit.DAYS.toSeconds(1));
-                }
                 /*Збереження для подальшого використання всіх потоків,
                  що будуть запущені для можливості подального вимкнення сповіщень
                   про поточний курс валют: */
